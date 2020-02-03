@@ -33,6 +33,7 @@ class ReactView(TemplateView):
         access_token = get_token(self.request)
         doctors = DoctorEndpoint(access_token)
         doctor_details = next(doctors.list())
+        kwargs['js_link'] = settings.JS_SRC
         return kwargs
 
 class SetupView(TemplateView):
