@@ -6,21 +6,22 @@ from social_django.models import UserSocialAuth
 from drchrono.endpoints import AppointmentEndpoint, DoctorEndpoint
 from django.http import JsonResponse, QueryDict
 from datetime import datetime
-from drchrono.models import PatientWaiting
+from drchrono.models import PatientWaiting, AppointmentStatusChange
 from django.conf import settings
 from channels import Group
+from datetime import datetime
 
 import json
 import hashlib, hmac
 
 def get_token(request):
-  """
-  Social Auth module is configured to store our access tokens. This dark magic will fetch it for us if we've
-  already signed in.
-  """
-  oauth_provider = UserSocialAuth.objects.get(user=request.user, provider='drchrono')
-  access_token = oauth_provider.extra_data['access_token']
-  return access_token
+    """
+    Social Auth module is configured to store our access tokens. This dark magic will fetch it for us if we've
+    already signed in.
+    """
+    oauth_provider = UserSocialAuth.objects.get(user=request.user, provider='drchrono')
+    access_token = oauth_provider.extra_data['access_token']
+    return access_token
 
 class ReactView(TemplateView):
     """
@@ -77,63 +78,48 @@ class DoctorWelcome(TemplateView):
         return kwargs
 
 def data_endpoint(request):
-  # TODO clean up
-  access_token = get_token(request)
-  doctors = DoctorEndpoint(access_token)
-  doctor_details = next(doctors.list())
-  time_waiting = PatientWaiting.average_wait_time()
-  data = {
-    'time_waiting': time_waiting
-  }
-  return JsonResponse(data, safe=False)
+    # TODO clean up
+    access_token = get_token(request)
+    doctors = DoctorEndpoint(access_token)
+    doctor_details = next(doctors.list())
+    doctor_id = doctor_details['id']
+    time_waiting = PatientWaiting.average_wait_time(doctor_id)
+    data = {
+        'time_waiting': time_waiting
+    }
+    return JsonResponse(data, safe=False)
 
 @csrf_exempt
 def hook_endpoint(request):
-  if request.method == 'GET':
-    return JsonResponse(webhook_verify(request))
+    if request.method == 'GET':
+        return JsonResponse(webhook_verify(request))
 
-  valid_token = False
-  if check_hook_token(request) != True:
-    return JsonResponse({
-        'block': 'block'
-    })
+    valid_token = False
+    if check_hook_token(request) != True:
+      return JsonResponse({
+          'block': 'block'
+      })
 
+    # detect event
+    event = request.META['HTTP_X_DRCHRONO_EVENT']
 
-  # detect event
-  event = request.META['HTTP_X_DRCHRONO_EVENT']
-  test = json.loads(request.body)
-  # exit early until sample messages are seen
-  return JsonResponse({'message': 'ack'})
+    # only listen to create and update
+    # otherwise, ack
+    if event != 'APPOINTMENT_CREATE' and event != 'APPOINTMENT_UPDATE':
+        return JsonResponse({'message': 'ack'})
 
-  data = json.loads(request.body).get('object')
+    parsed_body = json.loads(request.body)
+    data = parsed_body['object']
+    event_created_at = data['updated_at']
+    doctor_id = data['doctor']
 
-  # only listen to create and update
-  # otherwise, ack
-  if event != 'APPOINTMENT_CREATE' and event != 'APPOINTMENT_UPDATE':
+    # send message
+    Group('doctor-drch-grp-' + str(doctor_id)).send({'text': json.dumps({'event': event, 'data': data})})
+
+    # create appointment status change
+    AppointmentStatusChange.create_appointment_status(event, event_created_at, data)
+
     return JsonResponse({'message': 'ack'})
-
-  patient_id = data.get('patient_id')
-  appointment_id = data.get('patient_id')
-  status = data.get('status')
-  doctor_id = data.get('patient_id')
-
-  waiting_query = PatientWaiting.objects.filter(patient_id=patient_id, appointment_id=appointment_id, doctor_id=doctor_id)
-  if waiting_query.count() > 0:
-    current_time_waiting = obj.get('time_waiting')
-    # update time waiting if appropriate
-    waiting_query.update(time_waiting=abc)
-  else:
-    print 'nothing found'
-    patient_waiting = PatientWaiting(patient_id=patient_id, appointment_id=appointment_id, doctor_id=doctor_id, patient_waiting=123)
-    patient_waiting.save()
-
-  if event == 'APPOINTMENT_CREATE':
-    Group('doctor').send({'event': event, 'data': data})
-    print event
-  elif  event == 'APPOINTMENT_UPDATE':
-    Group('doctor').send({'event': event, 'data': data})
-
-  return JsonResponse({'message': 'ack'})
 
 def get_doctor_data(request):
     access_token = get_token(request)
@@ -157,21 +143,20 @@ def get_appointment_data(request):
     # mapped_data = for item in appointments
     data_to_return = []
     for appointment in appointments:
-      data_to_return.append(appointment)
+        data_to_return.append(appointment)
 
     return JsonResponse(data_to_return, safe=False)
 
 # TODO handle csrf
 @csrf_exempt
 def update_appointment(request):
-  access_token = get_token(request)
-  data = json.loads(request.body)
-  appointment_id = data.get('appointment_id')
-  status = data.get('status')
-  api = AppointmentEndpoint(access_token)
-  test = api.update(appointment_id, {'status': status})
-  return JsonResponse({'message': 'success'}, safe=False)
-
+    access_token = get_token(request)
+    data = json.loads(request.body)
+    appointment_id = data.get('appointment_id')
+    status = data.get('status')
+    api = AppointmentEndpoint(access_token)
+    test = api.update(appointment_id, {'status': status})
+    return JsonResponse({'message': 'success'}, safe=False)
 
 def check_hook_token(request):
     if settings.WEBHOOK_SECRET_TOKEN is None or settings.WEBHOOK_SECRET_TOKEN == '' or request.META['HTTP_X_DRCHRONO_SIGNATURE'] != settings.WEBHOOK_SECRET_TOKEN:
