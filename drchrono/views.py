@@ -137,7 +137,7 @@ def get_doctor_data(request):
     access_token = get_token(request)
     doctors = DoctorEndpoint(access_token)
     doctor_details = next(doctors.list())
-    return JsonResponse(doctor_details, safe=False)
+    return JsonResponse({'test': 'test'}, safe=False)
 
 def get_appointment_data(request):
     access_token = get_token(request)
