@@ -2,6 +2,7 @@ from django.db import models
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 from django.db.models import Avg
+from datetime import datetime
 # Add your models here
 
 # helpers
