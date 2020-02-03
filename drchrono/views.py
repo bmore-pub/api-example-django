@@ -88,14 +88,15 @@ def data_endpoint(request):
 
 @csrf_exempt
 def hook_endpoint(request):
+  if request.method == 'GET':
+    return JsonResponse(webhook_verify(request))
+
   valid_token = False
   if check_hook_token(request) != True:
     return JsonResponse({
         'block': 'block'
     })
 
-  if request.method == 'GET':
-    return JsonResponse(webhook_verify(request))
 
   # detect event
   event = request.META['HTTP_X_DRCHRONO_EVENT']
@@ -175,7 +176,6 @@ def check_hook_token(request):
       return True
 
 def webhook_verify(request):
-    check_hook_token(request)
     secret_token = hmac.new(settings.WEBHOOK_SECRET_TOKEN, request.GET['msg'], hashlib.sha256).hexdigest()
 
     return {
