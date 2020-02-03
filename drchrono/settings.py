@@ -82,7 +82,9 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'drchrono.wsgi.application'
 
+APPEND_SLASH=False
 if IN_DEV == False:
+    SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
     CHANNEL_LAYERS = {
         "default": {
             "BACKEND": "asgi_redis.RedisChannelLayer",
