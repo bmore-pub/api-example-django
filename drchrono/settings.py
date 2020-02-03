@@ -25,6 +25,8 @@ SECRET_KEY = os.getenv('SECRET_KEY')
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
+IN_DEV = False
+
 ALLOWED_HOSTS = [os.getenv('ALLOWED_HOST')]
 
 # Application definition
@@ -81,24 +83,31 @@ WSGI_APPLICATION = 'drchrono.wsgi.application'
 
 CHANNEL_LAYERS = {
     "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
-         "CONFIG": {
-            "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
-        },
+        "BACKEND": "asgiref.inmemory.ChannelLayer",
         "ROUTING": "drchrono.routing.channel_routing",
     },
 }
 
-
-# Database
-# https://docs.djangoproject.com/en/1.8/ref/settings/#databases
-DATABASES = {
-    'default': {
+if IN_DEV == False:
+    # Database
+    # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
+    DATABASES = {
+        'default': {
+            'ENGINE': 'django.db.backends.postgresql',
+            'NAME': os.getenv('db_name'),
+            'USER': os.getenv('db_user'),
+            'PASSWORD': os.getenv('db_password'),
+            'HOST': os.getenv('db_host'),
+            'PORT': os.getenv('db_port'),
+        }
+    }
+else:
+   DATABASES = {
+     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
         'NAME': 'drchrono.sqlite3',
-    }
-}
-
+     }
+   }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
