@@ -81,14 +81,17 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'drchrono.wsgi.application'
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "asgiref.inmemory.ChannelLayer",
-        "ROUTING": "drchrono.routing.channel_routing",
-    },
-}
-
 if IN_DEV == False:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "asgi_redis.RedisChannelLayer",
+            "CONFIG": {
+                "hosts": [os.environ.get('REDIS_URL', 'redis://localhost:6379')],
+            },
+            "ROUTING": "drchrono.routing.channel_routing",
+        },
+    }
+
     # Database
     # https://docs.djangoproject.com/en/1.8/ref/settings/#databases
     DATABASES = {
@@ -102,6 +105,13 @@ if IN_DEV == False:
         }
     }
 else:
+    CHANNEL_LAYERS = {
+        "default": {
+            "BACKEND": "asgiref.inmemory.ChannelLayer",
+            "ROUTING": "drchrono.routing.channel_routing",
+        },
+    }
+
    DATABASES = {
      'default': {
         'ENGINE': 'django.db.backends.sqlite3',
