@@ -105,30 +105,6 @@ const FixedMenuLayout = (props) => {
     )
   }
 
-  const renderFooter = () => {
-    return (
-      <Segment inverted vertical style={{ margin: '5em 0em 0em', padding: '5em 0em' }}>
-        <Container textAlign='center'>
-          <Divider inverted section />
-          <List horizontal inverted divided link size='small'>
-            <List.Item as='a' href='#'>
-              Site Map
-          </List.Item>
-            <List.Item as='a' href='#'>
-              Contact Us
-          </List.Item>
-            <List.Item as='a' href='#'>
-              Terms and Conditions
-          </List.Item>
-            <List.Item as='a' href='#'>
-              Privacy Policy
-          </List.Item>
-          </List>
-        </Container>
-      </Segment>
-    )
-  }
-
   return (
     <div>
       {renderMenu()}
@@ -142,7 +118,6 @@ const FixedMenuLayout = (props) => {
         {showAllAppointments && (<AllAppointments appointments={appointments} updateAppointment={updateAppointment} />)}
         {!showAllAppointments && (<Appointments appointments={appointments} updateAppointment={updateAppointment} />)}
       </Container>
-      {/* {renderFooter()} */}
 
     </div >
   )

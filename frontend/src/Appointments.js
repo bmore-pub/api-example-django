@@ -1,6 +1,7 @@
 import React from 'react'
 
 import Appointment from './Appointment'
+import WaitingAppointment from './WaitingAppointment'
 import * as moment from 'moment'
 import {
   Container,
@@ -35,33 +36,6 @@ const Appointments = (props) => {
 
   const getExpectedEndTime = (startTime, duration) => {
     return moment(startTime).add('minute', duration).format("HH:mm")
-  }
-
-  const renderCheckedInPatient = (appointment) => {
-    const { color, reason, exam_room, scheduled_time } = appointment
-    var style = {}
-    if (color) {
-      style['borderBottom'] = `2px solid {color}`
-    }
-
-    return (
-      <Card key={appointment.id} style={style}>
-        <Card.Content>
-          <Card.Header>Room: {exam_room}</Card.Header>
-          <Card.Meta>Scheduled Time: {getTime(scheduled_time)}</Card.Meta>
-          <Card.Description>
-            {reason}
-          </Card.Description>
-        </Card.Content>
-        <Card.Content extra>
-          <div className='ui two buttons'>
-            <Button basic color='blue' onClick={() => updateAppointment(appointment.id, { status: 'In Session' })}>
-              Begin Encounter
-            </Button>
-          </div>
-        </Card.Content>
-      </Card >
-    )
   }
 
   const renderActiveEncounter = (appointment) => {
@@ -112,7 +86,7 @@ const Appointments = (props) => {
     return (
       <Card.Group>
         {appointments.map(appointment =>
-          renderCheckedInPatient(appointment)
+          <WaitingAppointment key={appointment.id} appointment={appointment} />
         )}
       </Card.Group>
     )
