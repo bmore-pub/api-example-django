@@ -28,6 +28,13 @@ class ReactView(TemplateView):
     """
     template_name = 'main.html'
 
+    def get_context_data(self, **kwargs):
+        # TODO refactor - blocking unauthed requests
+        access_token = get_token(self.request)
+        doctors = DoctorEndpoint(access_token)
+        doctor_details = next(doctors.list())
+        return kwargs
+
 class SetupView(TemplateView):
     """
     The beginning of the OAuth sign-in flow. Logs a user into the kiosk, and saves the token.
@@ -139,6 +146,7 @@ def get_appointment_data(request):
     doctor_id = doctor_details.get('id')
     api = AppointmentEndpoint(access_token)
     date_for_query = datetime.today().strftime('%Y-%m-%d')
+    date_for_query = '2020-01-30'
     appointments = api.list({'doctor': doctor_id}, date_for_query)
 
     # mapped_data = for item in appointments
