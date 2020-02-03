@@ -3,7 +3,7 @@ from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from social_django.models import UserSocialAuth
 
-from drchrono.endpoints import AppointmentEndpoint, CurrentUserEndpoint, DoctorEndpoint
+from drchrono.endpoints import AppointmentEndpoint, DoctorEndpoint
 from django.http import JsonResponse, QueryDict
 from datetime import datetime
 from drchrono.models import PatientWaiting
