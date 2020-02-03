@@ -15,7 +15,8 @@
   },
   "scripts": {
     "watch": "webpack --watch --mode development",
-    "start": "webpack-dev-server --open"
+    "start": "webpack-dev-server --open",
+    "build": "webpack"
   },
   "eslintConfig": {
     "extends": "react-app"

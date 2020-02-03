@@ -139,7 +139,11 @@ def get_doctor_data(request):
     access_token = get_token(request)
     doctors = DoctorEndpoint(access_token)
     doctor_details = next(doctors.list())
-    return JsonResponse({'test': 'test'}, safe=False)
+    formatted_details = {
+        'first_name': doctor_details.get('first_name'),
+        'last_name': doctor_details.get('last_name'),
+    }
+    return JsonResponse(formatted_details)
 
 def get_appointment_data(request):
     access_token = get_token(request)
@@ -148,7 +152,6 @@ def get_appointment_data(request):
     doctor_id = doctor_details.get('id')
     api = AppointmentEndpoint(access_token)
     date_for_query = datetime.today().strftime('%Y-%m-%d')
-    date_for_query = '2020-01-30'
     appointments = api.list({'doctor': doctor_id}, date_for_query)
 
     # mapped_data = for item in appointments

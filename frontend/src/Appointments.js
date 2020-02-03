@@ -82,11 +82,11 @@ const Appointments = (props) => {
     )
   }
 
-  const renderCheckedInPatients = (appointments) => {
+  const renderWaitingPatients = (appointments) => {
     return (
       <Card.Group>
         {appointments.map(appointment =>
-          <WaitingAppointment key={appointment.id} appointment={appointment} />
+          <WaitingAppointment key={appointment.id} appointment={appointment} updateAppointment={updateAppointment} />
         )}
       </Card.Group>
     )
@@ -99,8 +99,10 @@ const Appointments = (props) => {
       <div>Next scheduled break: 3pm</div>
 
       {renderActiveEncounters(activeEncounters)}
+      <h4>Waiting in room patients ({inRoomAppointments.length})</h4>
+      {renderWaitingPatients(inRoomAppointments)}
       <h4>Checked-in patients ({arrivedOrCheckedInAppointments.length})</h4>
-      {renderCheckedInPatients(arrivedOrCheckedInAppointments)}
+      {renderWaitingPatients(arrivedOrCheckedInAppointments)}
     </div>
   )
 }

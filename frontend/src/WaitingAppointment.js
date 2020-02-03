@@ -18,14 +18,19 @@ import {
 
 const getTime = (datetime) => moment(datetime).format("HH:mm")
 const getTimeWaiting = (appointment) => {
-  const { status_transitions, scheduled_time } = appointment
   // TODO consider status transitions?
-  return moment.duration(moment().diff(moment(scheduled_time))).humanize()
+  const { status_transitions, scheduled_time } = appointment
+  const diff = moment().diff(moment(scheduled_time))
+  if (diff <= 0) {
+    return 'n/a'
+  } else {
+    return moment.duration(diff).humanize()
+  }
 }
 const WaitingAppointment = (props) => {
   const [currentTime, setCurrentTime] = useState(moment())
-  const { appointment } = props
-  const { color, reason, exam_room, scheduled_time } = appointment
+  const { appointment, updateAppointment } = props
+  const { status, color, reason, exam_room, scheduled_time } = appointment
   const timeWaiting = getTimeWaiting(appointment)
   const formattedScheduledTime = getTime(scheduled_time)
   var style = {}
@@ -46,7 +51,7 @@ const WaitingAppointment = (props) => {
   return (
     <Card key={appointment.id} style={style}>
       <Card.Content>
-        <Card.Header>Room: {exam_room}</Card.Header>
+        <Card.Header>Status: {status} -- Room: {exam_room}</Card.Header>
         <Card.Meta>Scheduled Time: {formattedScheduledTime}</Card.Meta>
         <Card.Meta>Waiting: {timeWaiting}</Card.Meta>
         <Card.Description>

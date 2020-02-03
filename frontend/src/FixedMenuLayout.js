@@ -22,7 +22,6 @@ const FixedMenuLayout = (props) => {
   const [appointments, setAppointments] = useState([])
   const [showAllAppointments, setShowAllAppointments] = useState(false)
   const [doctor, setDoctor] = useState(false)
-  const url = location.origin.replace('http', 'ws') + '/test-socket'
 
   socketConn.onmessage = e => {
     console.log(e.data)
