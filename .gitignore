@@ -94,3 +94,6 @@ ENV/
 
 # secret environment stuff
 docker/environment
+
+# frontend
+node_modules

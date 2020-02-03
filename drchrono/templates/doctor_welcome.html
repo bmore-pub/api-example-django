@@ -6,6 +6,25 @@
 </head>
 <body>
 <h1>Welcome {{ doctor.first_name }} {{ doctor.last_name }}</h1>
-{{ doctor }}
+<ul>
+{% for key, value in doctor.items %}
+    <li>{{key}} -- {{ value }}</li>
+{% endfor %}
+------------------------------------------------
+</ul>
+<ul>
+{% for appointment in appointments %}
+    <h2>Appointment --- </h2>
+    {% for key, value in appointment.items %}
+        {% if value != None %}
+        <li>{{key}} -- {{ value }}</li>
+        {% endif %}
+    {% endfor %}
+    <BR/>
+    <BR/>
+    <BR/>
+
+{% endfor %}
+</ul>
 </body>
 </html>

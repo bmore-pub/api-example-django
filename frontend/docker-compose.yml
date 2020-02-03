@@ -1,0 +1,12 @@
+version: '2'
+services:
+  reactdev:
+    container_name: reactdev
+    image: reactdev
+    ports:
+      - "3000:3000"
+    command: /bin/bash -c "while true; do echo 'test'; sleep 2; done"
+    volumes:
+      - ".:/usr/src/app"
+    working_dir: /usr/src/app
+    build: .
