@@ -10,7 +10,6 @@ import views
 urlpatterns = [
     url(r'^setup/$', views.SetupView.as_view(), name='setup'),
     url(r'^main/$', views.ReactView.as_view(), name='react-review'),
-    url(r'^welcome/$', views.DoctorWelcome.as_view(), name='welcome'),
     url(r'^get-appointments/$', views.get_appointment_data, name='get-appointments'),
     url(r'^get-doctor/$', views.get_doctor_data, name='get-doctor'),
     url(r'^update-appointment/$', views.update_appointment, name='update-appointment'),
