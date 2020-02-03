@@ -1,20 +1,10 @@
 import React from 'react'
 
-import Appointment from './Appointment'
 import WaitingAppointment from './WaitingAppointment'
 import * as moment from 'moment'
 import {
-  Container,
-  Divider,
-  Dropdown,
-  Grid,
-  Header,
-  Image,
   Card,
   Button,
-  List,
-  Menu,
-  Segment,
 } from 'semantic-ui-react'
 
 const activeEncounterStatuses = ['In Session']
@@ -94,13 +84,11 @@ const Appointments = (props) => {
 
   return (
     <div>
-      <div>{activeEncounters.length} active {activeEncounters.length === 1 ? "encounter" : "encounters"}</div>
-      <div>{inRoomAppointments.length} {inRoomAppointments.length === 1 ? "patient" : "patients"} ready in room</div>
-
+      <h4>Active Encounters</h4>
       {renderActiveEncounters(activeEncounters)}
-      <h4>Waiting in room patients ({inRoomAppointments.length})</h4>
+      <h4>Waiting in room ({inRoomAppointments.length})</h4>
       {renderWaitingPatients(inRoomAppointments)}
-      <h4>Checked-in patients ({arrivedOrCheckedInAppointments.length})</h4>
+      <h4>Checked-in ({arrivedOrCheckedInAppointments.length})</h4>
       {renderWaitingPatients(arrivedOrCheckedInAppointments)}
     </div>
   )

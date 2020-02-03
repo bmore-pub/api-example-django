@@ -104,8 +104,8 @@ const Dashboard = (props) => {
   }
 
   const getAverageWait = (statistics) => {
-    if (statistics && statistics.patient_waiting) {
-      return moment.duration(statistics.patient_waiting).minutes()
+    if (statistics && statistics.time_waiting) {
+      return moment.duration(statistics.time_waiting).humanize()
     }
     return 'No data available'
   }

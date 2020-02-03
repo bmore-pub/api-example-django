@@ -3,17 +3,8 @@ import * as moment from 'moment'
 import * as R from 'ramda'
 
 import {
-  Container,
-  Divider,
-  Dropdown,
-  Grid,
-  Header,
-  Image,
   Card,
   Button,
-  List,
-  Menu,
-  Segment,
 } from 'semantic-ui-react'
 
 const getTime = (datetime) => moment(datetime).format("HH:mm")
