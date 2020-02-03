@@ -22,9 +22,23 @@ const FixedMenuLayout = (props) => {
   const [appointments, setAppointments] = useState([])
   const [showAllAppointments, setShowAllAppointments] = useState(false)
   const [doctor, setDoctor] = useState(false)
+  const [statistics, setStatistics] = useState({ 'patient_waiting': 0 })
 
   socketConn.onmessage = e => {
-    console.log(e.data)
+    let data = {}
+    try {
+      data = JSON.parse(e.data)
+    } catch (err) {
+      //ignore message
+    }
+
+    if (data.event == 'APPOINTMENT_CREATE') {
+      setAppointments(R.append(data.data, appointments))
+    } else if (data.event == 'APPOINTMENT_UPDATE') {
+      const index = R.findIndex(R.propEq('id', data.data.id))(appointments)
+      const updatedAppointments = R.update(index, data.data, appointments)
+      setAppointments(updatedAppointments)
+    }
   };
 
   socketConn.onopen = () => {
@@ -38,6 +52,13 @@ const FixedMenuLayout = (props) => {
   socketConn.onclose = () => {
     console.log("WebSocket closed, restarting..");
   };
+
+  async function getStatistics() {
+    const res = API.getStatistics()
+      .then(res => {
+        setStatistics(res.data)
+      })
+  }
 
   async function fetchAppointments() {
     const res = API.getAppointments()
@@ -72,6 +93,7 @@ const FixedMenuLayout = (props) => {
   useEffect(() => {
     fetchAppointments();
     fetchDoctor();
+    getStatistics();
   }, [])
 
   const renderMenu = () => {
@@ -81,27 +103,16 @@ const FixedMenuLayout = (props) => {
           DrChrono Hackathon
         </Menu.Item>
         <Menu.Item as='a'>Home</Menu.Item>
-
-        <Dropdown item simple text='Dropdown'>
-          <Dropdown.Menu>
-            <Dropdown.Item>List Item</Dropdown.Item>
-            <Dropdown.Item>List Item</Dropdown.Item>
-            <Dropdown.Divider />
-            <Dropdown.Header>Header Item</Dropdown.Header>
-            <Dropdown.Item>
-              <i className='dropdown icon' />
-              <span className='text'>Submenu</span>
-              <Dropdown.Menu>
-                <Dropdown.Item>List Item</Dropdown.Item>
-                <Dropdown.Item>List Item</Dropdown.Item>
-              </Dropdown.Menu>
-            </Dropdown.Item>
-            <Dropdown.Item>List Item</Dropdown.Item>
-          </Dropdown.Menu>
-        </Dropdown>
       </Container>
     </Menu>
     )
+  }
+
+  const getAverageWait = (statistics) => {
+    if (statistics && statistics.patient_waiting) {
+      return moment.duration(statistics.patient_waiting).minutes()
+    }
+    return 'No data available'
   }
 
   return (
@@ -109,6 +120,9 @@ const FixedMenuLayout = (props) => {
       {renderMenu()}
       <Container style={{ marginTop: '7em' }}>
         <DoctorDetails doctor={doctor} />
+        <div>
+          Average Patient Waiting: {getAverageWait(statistics)}
+        </div>
         <Button style={{ margin: "5px;" }} onClick={() => setShowAllAppointments(!showAllAppointments)}>
           {!showAllAppointments && ("Show All Appointments")}
           {showAllAppointments && ("Show Dashboard")}

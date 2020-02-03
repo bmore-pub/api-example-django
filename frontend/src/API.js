@@ -8,6 +8,10 @@ const getDoctor = () => {
   return axios.get("/get-doctor/")
 }
 
+const getStatistics = () => {
+  return axios.get("/data-endpoint/")
+}
+
 const updateAppointment = (appointmentId, updateParams) => {
   return axios.patch("/update-appointment/", {
     ...updateParams,
@@ -18,5 +22,6 @@ const updateAppointment = (appointmentId, updateParams) => {
 export default {
   getAppointments,
   getDoctor,
+  getStatistics,
   updateAppointment
 }

@@ -96,7 +96,6 @@ const Appointments = (props) => {
     <div>
       <div>{activeEncounters.length} active {activeEncounters.length === 1 ? "encounter" : "encounters"}</div>
       <div>{inRoomAppointments.length} {inRoomAppointments.length === 1 ? "patient" : "patients"} ready in room</div>
-      <div>Next scheduled break: 3pm</div>
 
       {renderActiveEncounters(activeEncounters)}
       <h4>Waiting in room patients ({inRoomAppointments.length})</h4>
