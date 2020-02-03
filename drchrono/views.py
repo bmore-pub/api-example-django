@@ -3,11 +3,15 @@ from django.views.generic import TemplateView
 from django.views.decorators.csrf import csrf_exempt
 from social_django.models import UserSocialAuth
 
-from drchrono.endpoints import AppointmentEndpoint, DoctorEndpoint
+from drchrono.endpoints import AppointmentEndpoint, CurrentUserEndpoint, DoctorEndpoint
 from django.http import JsonResponse, QueryDict
 from datetime import datetime
 from drchrono.models import PatientWaiting
+from django.conf import settings
+from channels import Group
+
 import json
+import hashlib, hmac
 
 def get_token(request):
   """
@@ -72,6 +76,15 @@ def data_endpoint(request):
   return JsonResponse(data, safe=False)
 
 def hook_endpoint(request):
+  valid_token = False
+  if check_token(request) != True:
+    return JsonResponse({
+        'block': 'block'
+    })
+
+  if request.method == 'GET':
+    return JsonResponse(webhook_verify(request))
+
   # detect event
   event = 'APPOINTMENT_CREATE'
   event = 'APPOINTMENT_MODIFY'
@@ -131,3 +144,18 @@ def update_appointment(request):
   api = AppointmentEndpoint(access_token)
   test = api.update(appointment_id, {'status': status})
   return JsonResponse({'message': 'success'}, safe=False)
+
+
+def check_token(request):
+    if settings.WEBHOOK_SECRET_TOKEN is None or settings.WEBHOOK_SECRET_TOKEN == '' or request.META['HTTP_X_DRCHRONO_SIGNATURE'] != settings.WEBHOOK_SECRET_TOKEN:
+        return False
+    else:
+      return True
+
+def webhook_verify(request):
+    check_token(request)
+    secret_token = hmac.new(settings.WEBHOOK_SECRET_TOKEN, request.GET['msg'], hashlib.sha256).hexdigest()
+
+    return {
+        'secret_token': secret_token
+    }

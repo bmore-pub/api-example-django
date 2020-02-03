@@ -18,9 +18,27 @@ import AllAppointments from './AllAppointments'
 import API from './API'
 
 const FixedMenuLayout = (props) => {
+  const socketConn = props.socketConn
   const [appointments, setAppointments] = useState([])
   const [showAllAppointments, setShowAllAppointments] = useState(false)
   const [doctor, setDoctor] = useState(false)
+  const url = location.origin.replace('http', 'ws') + '/test-socket'
+
+  socketConn.onmessage = e => {
+    console.log(e.data)
+  };
+
+  socketConn.onopen = () => {
+    console.log("WebSocket open");
+  };
+
+  socketConn.onerror = e => {
+    console.log(e.message);
+  };
+
+  socketConn.onclose = () => {
+    console.log("WebSocket closed, restarting..");
+  };
 
   async function fetchAppointments() {
     const res = API.getAppointments()

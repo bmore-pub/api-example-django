@@ -14,7 +14,8 @@ class PatientWaiting(models.Model):
     patient_id = models.BigIntegerField()
     appointment_id = models.BigIntegerField()
     time_waiting = models.BigIntegerField()
+    doctor_id = models.BigIntegerField()
 
     @staticmethod
-    def average_wait_time():
-        return PatientWaiting.objects.all().aggregate(Avg('time_waiting')).get("time_waiting__avg")
+    def average_wait_time(doctor_id):
+        return PatientWaiting.objects.filter(doctor_id=doctor_id).aggregate(Avg('time_waiting')).get("time_waiting__avg")
