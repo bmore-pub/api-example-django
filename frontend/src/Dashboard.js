@@ -1,23 +1,16 @@
-import React, { useState, useEffect, usePrevious } from 'react'
+import React, { useState, useEffect } from 'react'
 import * as R from 'ramda'
 import {
   Container,
-  Divider,
-  Dropdown,
-  Grid,
-  Header,
-  Image,
-  List,
   Menu,
   Button,
-  Segment,
 } from 'semantic-ui-react'
 import DoctorDetails from './DoctorDetails'
 import Appointments from './Appointments'
 import AllAppointments from './AllAppointments'
 import API from './API'
 
-const FixedMenuLayout = (props) => {
+const Dashboard = (props) => {
   const socketConn = props.socketConn
   const [appointments, setAppointments] = useState([])
   const [showAllAppointments, setShowAllAppointments] = useState(false)
@@ -34,10 +27,12 @@ const FixedMenuLayout = (props) => {
 
     if (data.event == 'APPOINTMENT_CREATE') {
       setAppointments(R.append(data.data, appointments))
-    } else if (data.event == 'APPOINTMENT_UPDATE') {
+    } else if (data.event == 'APPOINTMENT_MODIFY') {
       const index = R.findIndex(R.propEq('id', data.data.id))(appointments)
       const updatedAppointments = R.update(index, data.data, appointments)
       setAppointments(updatedAppointments)
+    } else {
+      console.log(e)
     }
   };
 
@@ -136,4 +131,4 @@ const FixedMenuLayout = (props) => {
   )
 }
 
-export default FixedMenuLayout
+export default Dashboard
