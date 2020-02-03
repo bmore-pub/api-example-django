@@ -1,18 +1,26 @@
 from channels import Group
-from channels.sessions import channel_session
+from channels.auth import http_session_user, channel_session_user, channel_session_user_from_http
 
-@channel_session
+def get_group(username):
+  return 'doctor-drch-grp-' + username
+
+@channel_session_user_from_http
 def ws_connect(message):
     # Accept the incoming connection
     message.reply_channel.send({"accept": True})
-    Group("doctor").add(message.reply_channel)
+    group = get_group(message.user.username)
+    Group(group).add(message.reply_channel)
+    Group(group).send({'text': message.user.username})
 
-@channel_session
+@channel_session_user
 def ws_receive(message):
     label = message.channel_session['doctor']
     data = json.loads(message['text'])
-    Group('doctor').send({'text': json.dumps(data)})
+    group = get_group(message.user.username)
+    Group(group).send({'text': message.user.username})
 
-@channel_session
+@channel_session_user
 def ws_disconnect(message):
-    Group('doctor').discard(message.reply_channel)
+    group = get_group(message.user.username)
+    group = 'doctor' + message.user.username
+    Group(group).discard(message.reply_channel)
