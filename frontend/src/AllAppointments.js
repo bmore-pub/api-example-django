@@ -15,6 +15,7 @@ import {
   Segment,
 } from 'semantic-ui-react'
 
+// TODO remove this
 const activeEncounterStatuses = ['In Session']
 const inRoomStatuses = ['In Room']
 const arrivedOrCheckedInStatuses = ['Arrived', 'Checked In', 'Checked In Online']

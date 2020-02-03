@@ -71,7 +71,7 @@ def hook_endpoint(request):
 
     # only listen to create and update
     # otherwise, ack
-    if event != 'APPOINTMENT_CREATE' and event != 'APPOINTMENT_UPDATE':
+    if event != 'APPOINTMENT_CREATE' and event != 'APPOINTMENT_MODIFY':
         return JsonResponse({'message': 'ack'})
 
     parsed_body = json.loads(request.body)
