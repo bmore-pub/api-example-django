@@ -112,12 +112,12 @@ else:
         },
     }
 
-   DATABASES = {
-     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'drchrono.sqlite3',
-     }
-   }
+    DATABASES = {
+        'default': {
+          'ENGINE': 'django.db.backends.sqlite3',
+          'NAME': 'drchrono.sqlite3',
+        }
+    }
 
 # Internationalization
 # https://docs.djangoproject.com/en/1.8/topics/i18n/
